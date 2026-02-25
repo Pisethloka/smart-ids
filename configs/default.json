@@ -1,0 +1,18 @@
+{
+  "suspicious_ports": [23, 4444],
+  "icmp_cooldown_sec": 3,
+
+  "scan_window_sec": 10,
+  "portscan_unique_ports": 12,
+  "synscan_syn_count": 20,
+
+  "bpf_filter": "icmp or tcp",
+
+  "log_file_txt": "ids_log.txt",
+  "log_file_jsonl": "ids_log.jsonl",
+
+  "interface_mode": "auto",
+  "interface_index": 0,
+
+  "deque_maxlen": 2000
+}

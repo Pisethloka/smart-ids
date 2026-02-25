@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+ids_log.txt
+ids_log.jsonl
+.env

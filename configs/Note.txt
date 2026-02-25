@@ -1,0 +1,16 @@
+==============================
+suspicious_ports": [23, 4444]
+==============================
+-> if any TCP packet goes to one of these destination ports -> IDS raise a MEDIUM alert
+
+23 -> Telnet (old, unencrypted, insecure)
+44444 -> Commonly used in labs as backdoor / reverse shell port
+
+Example: If traffic attempts to connect to known risky service ports, the IDS flags it as suspicious
+
+==============================
+"icmp_cooldown_set": 3,
+==============================
+->  Prevents ping spam
+- IDS will only log one ICMP event per (src -> dst) every 3 seconds
+- Without this, ping command could generate a lot of unnecessary alerts
