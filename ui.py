@@ -5,7 +5,7 @@ from tkinter.scrolledtext import ScrolledText
 
 from ids.config import load_config
 from ids.detectors import IDSDetectors
-from ids.interface_win import pick_interface
+from ids.interface_picker import pick_interface_cross_platform                                                
 from ids.logger import EventLogger
 from ids.sniffer import IDSSniffer
 
@@ -143,7 +143,7 @@ class IDSUI:
     def run_ids(self):
         try:
             cfg = load_config("configs/default.json")
-            iface = pick_interface(mode=cfg.interface_mode, index=cfg.interface_index)
+            iface = pick_interface_cross_platform(mode=cfg.interface_mode, index=cfg.interface_index)
 
             logger = EventLogger(
                 cfg.log_file_txt, cfg.log_file_jsonl, ui_callback=self.ui_event_callback
