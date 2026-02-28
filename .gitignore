@@ -3,3 +3,4 @@ __pycache__/
 ids_log.txt
 ids_log.jsonl
 .env
+.venv/
