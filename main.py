@@ -8,7 +8,7 @@ from ids.sniffer import IDSSniffer
 
 
 def parse_args():
-    ap = argparse.ArgumentParser(description="Smart IDS v1.0 (Scapy)")
+    ap = argparse.ArgumentParser(description="Smart IDS v1.2 (Scapy)")
     ap.add_argument(
         "--config", default="configs/default.json", help="Path to config JSON"
     )
@@ -31,18 +31,21 @@ def main():
 
     # Windows interface picker import here so project can still be extended later for Linux/macOS
     try:
-        from ids.interface_win import pick_interface
+        from ids.interface_picker import pick_interface_cross_platform
+
+        chosen_interface = pick_interface_cross_platform(
+            mode=cfg.interface_mode,
+            index=cfg.interface_index
+        )
+
     except Exception as e:
         print("ERROR: Windows interface picker failed to import.")
         print("Make sure you are on Windows + have scapy installed correctly.")
         print(f"Details: {e}")
         sys.exit(1)
 
-    print("Starting Smart IDS v1.0 ...")
+    print("Starting Smart IDS v1.2 ...")
 
-    chosen_interface = pick_interface(
-        mode=cfg.interface_mode, index=cfg.interface_index
-    )
     logger = EventLogger(cfg.log_file_txt, cfg.log_file_jsonl)
     detectors = IDSDetectors(cfg, logger)
     sniffer = IDSSniffer(chosen_interface, cfg.bpf_filter, detectors)
@@ -61,7 +64,6 @@ def main():
         print("\nERROR: Run PowerShell as Administrator.")
     except Exception as e:
         print(f"\nERROR: {e}")
-
 
 if __name__ == "__main__":
     main()

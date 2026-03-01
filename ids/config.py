@@ -17,7 +17,7 @@ class IDSConfig:
     log_file_txt: str
     log_file_jsonl: str
 
-    interface_mode: str  # "auto" or "index"
+    interface_mode: str # "auto" or "index"
     interface_index: int
 
     deque_maxlen: int

@@ -1,0 +1,48 @@
+# For linux users
+    
+    -> Open your terminal amd write this: <-
+    =====================================
+        cd ~/smart-ids
+        source .venv/bin/activate
+        sudo .venv/bin/python ui.py
+    =====================================
+
+
+    -> ICPM Detection (LOW severity ICMP events and counter increases) <-
+    ======================================
+    ping -c 5 8.8.8.8
+    ======================================
+
+    -> Suspicious Port Test <-
+    ======================================
+    nc -zv 192.168.10.9 23
+    or  telnet 192.168.10.9 23
+    ======================================
+
+
+    -> Port Scan Test (Realisitic Attack Simulation) <-
+    ======================================
+    nmap -Pn -p 1-100 192.168.10.9
+    ======================================
+    ->/ Mutilple ports accessed
+    ->/ could trigger MEDIUM or HIGH
+    ->/ Port scan counter increases
+    ->/ add -Pn because i forced it to just scan ports not just do host discovery
+    ======================================
+
+
+    -> SYN Scan (Advanced) <-
+    ======================================
+    sudo nmap -sS 192.168.10.9
+    ======================================
+    ->/ This is a half open scan. It should trigger after threshold reached
+    =======================================================================
+
+
+    -> Normal Traffic (False Positive Test)
+    =======================================
+    curl https://google.com or any other sites
+    ==========================================
+    
+
+

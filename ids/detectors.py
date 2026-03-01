@@ -27,6 +27,14 @@ class IDSDetectors:
 
     # ---------- ICMP ----------
     def handle_icmp(self, packet, src_ip: str, dst_ip: str) -> None:
+        # ---- DEBUG (TEMP) ----
+        try:
+            icmp_layer = packet[ICMP]
+            print(f"[DBG ICMP] {src_ip} -> {dst_ip} type={int(icmp_layer.type)} code={int(icmp_layer.code)}")
+        except Exception:
+            pass
+        # ----------------------
+
         key = (src_ip, dst_ip)
         t = time.time()
         last = self._last_icmp.get(key, 0)
@@ -62,9 +70,7 @@ class IDSDetectors:
         cleanup_old_entries(dq, self.cfg.scan_window_sec)
 
         unique_ports = {dport for (ts, dport) in dq}
-        if len(unique_ports) >= self.cfg.portscan_unique_ports and self._can_scan_alert(
-            src_ip
-        ):
+        if len(unique_ports) >= self.cfg.portscan_unique_ports and self._can_scan_alert(src_ip):
             self.log.log(
                 severity="HIGH",
                 event_type="PORT_SCAN",
@@ -97,6 +103,14 @@ class IDSDetectors:
         tcp = packet[TCP]
         sport = int(tcp.sport)
         dport = int(tcp.dport)
+
+        # ---- DEBUG (TEMP) ----
+        # This prints to the TERMINAL where you launched `ui.py`
+        try:
+            print(f"[DBG TCP] {src_ip}:{sport} -> {dst_ip}:{dport} flags={tcp.flags}")
+        except Exception:
+            pass
+        # ----------------------
 
         # Track ports for port scan detection
         self._recent_ports_by_src[src_ip].append((time.time(), dport))

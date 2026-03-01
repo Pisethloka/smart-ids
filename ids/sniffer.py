@@ -11,6 +11,8 @@ class IDSSniffer:
         self._sniffer = None
 
     def packet_callback(self, packet) -> None:
+        print("[DBG] got packet:", packet.summary())
+
         if not packet.haslayer(IP):
             return
 
@@ -27,13 +29,16 @@ class IDSSniffer:
             return
 
     def start(self) -> None:
-        # Async sniffer so we can stop cleanly
-        self._sniffer = AsyncSniffer(
+        kwargs = dict(
             iface=self.iface,
-            filter=self.bpf_filter,
             prn=self.packet_callback,
             store=False,
         )
+        # Only apply BPF filter if non-empty
+        if self.bpf_filter and self.bpf_filter.strip():
+            kwargs["filter"] = self.bpf_filter
+
+        self._sniffer = AsyncSniffer(**kwargs)
         self._sniffer.start()
 
     def stop(self) -> None:
