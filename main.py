@@ -1,5 +1,6 @@
 import argparse
 import sys
+import time
 
 from ids.config import load_config
 from ids.detectors import IDSDetectors
@@ -23,24 +24,22 @@ def main():
     args = parse_args()
     cfg = load_config(args.config)
 
-    # Apply CLI overrides (if provided)
+    # Apply CLI overrides
     if args.iface_mode:
         cfg.interface_mode = args.iface_mode
     if args.iface_index is not None:
         cfg.interface_index = args.iface_index
 
-    # Windows interface picker import here so project can still be extended later for Linux/macOS
+    # Interface picker
     try:
         from ids.interface_picker import pick_interface_cross_platform
 
         chosen_interface = pick_interface_cross_platform(
-            mode=cfg.interface_mode,
-            index=cfg.interface_index
+            mode=cfg.interface_mode, index=cfg.interface_index
         )
 
     except Exception as e:
-        print("ERROR: Windows interface picker failed to import.")
-        print("Make sure you are on Windows + have scapy installed correctly.")
+        print("ERROR: Interface picker failed.")
         print(f"Details: {e}")
         sys.exit(1)
 
@@ -57,13 +56,22 @@ def main():
     print("Press Ctrl+C to stop...\n")
 
     try:
-        sniffer.run()
+        sniffer.start()
+
+        # Keep program alive while AsyncSniffer runs
+        while True:
+            time.sleep(1)
+
     except KeyboardInterrupt:
-        print("\nIDS stopped.")
+        print("\nStopping IDS...")
+        sniffer.stop()
+
     except PermissionError:
-        print("\nERROR: Run PowerShell as Administrator.")
+        print("\nERROR: Run terminal as Administrator.")
+
     except Exception as e:
         print(f"\nERROR: {e}")
+
 
 if __name__ == "__main__":
     main()

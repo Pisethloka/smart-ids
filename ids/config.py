@@ -1,4 +1,5 @@
 import json
+import os
 from dataclasses import dataclass
 from typing import Set
 
@@ -7,23 +8,24 @@ from typing import Set
 class IDSConfig:
     suspicious_ports: Set[int]
     icmp_cooldown_sec: int
-
     scan_window_sec: int
     portscan_unique_ports: int
     synscan_syn_count: int
-
     bpf_filter: str
-
     log_file_txt: str
     log_file_jsonl: str
-
-    interface_mode: str # "auto" or "index"
+    interface_mode: str
     interface_index: int
-
     deque_maxlen: int
 
 
 def load_config(path: str) -> IDSConfig:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(current_dir)
+
+    if not os.path.isabs(path):
+        path = os.path.join(project_root, path)
+
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
 

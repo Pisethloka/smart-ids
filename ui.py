@@ -98,8 +98,8 @@ class IDSUI:
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
     # ---------------- UI Building ----------------
+    # ---------------- UI Building ----------------
     def _build_style(self):
-        # ttk theme tweaks (optional)
         style = ttk.Style()
         try:
             style.theme_use("clam")
@@ -111,6 +111,16 @@ class IDSUI:
             fieldbackground=self.COL_PANEL_2,
             background=self.COL_PANEL,
             foreground=self.COL_TEXT,
+            bordercolor=self.COL_BORDER,
+            arrowcolor=self.COL_RED,
+        )
+
+        # --- FIX THE READONLY COLOR ---
+        style.map(
+            "TCombobox",
+            fieldbackground=[("readonly", self.COL_PANEL_2)],
+            selectbackground=[("readonly", self.COL_PANEL_2)],
+            selectforeground=[("readonly", self.COL_RED)],
         )
 
     def _panel(self, parent, pad=(10, 10), fill=tk.BOTH, expand=False):
@@ -125,15 +135,18 @@ class IDSUI:
 
     def _kpi_card(self, parent, title, var, color):
         card = tk.Frame(
-            parent, bg=self.COL_PANEL, highlightthickness=1, highlightbackground=self.COL_BORDER
+            parent,
+            bg=self.COL_PANEL,
+            highlightthickness=1,
+            highlightbackground=self.COL_BORDER,
         )
         card.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=6)
-        tk.Label(card, text=title, bg=self.COL_PANEL, fg=self.COL_MUTED, font=self.FONT).pack(
-            anchor="w", padx=10, pady=(8, 0)
-        )
-        tk.Label(card, textvariable=var, bg=self.COL_PANEL, fg=color, font=self.FONT_KPI).pack(
-            anchor="w", padx=10, pady=(0, 8)
-        )
+        tk.Label(
+            card, text=title, bg=self.COL_PANEL, fg=self.COL_MUTED, font=self.FONT
+        ).pack(anchor="w", padx=10, pady=(8, 0))
+        tk.Label(
+            card, textvariable=var, bg=self.COL_PANEL, fg=color, font=self.FONT_KPI
+        ).pack(anchor="w", padx=10, pady=(0, 8))
         return card
 
     def _build_layout(self):
@@ -149,7 +162,6 @@ class IDSUI:
             font=self.FONT_TITLE,
         ).pack(side=tk.LEFT)
 
-        # Status pill
         self.status_pill = tk.Label(
             header,
             textvariable=self.status_var,
@@ -190,48 +202,63 @@ class IDSUI:
         )
         self.stop_btn.pack(side=tk.LEFT, padx=(0, 12))
 
-        # Interface / Filter / Packet rate quick info
         info = tk.Frame(controls, bg=self.COL_BG)
         info.pack(side=tk.LEFT)
 
-        tk.Label(info, text="iface:", bg=self.COL_BG, fg=self.COL_MUTED, font=self.FONT).grid(
-            row=0, column=0, sticky="w"
-        )
-        tk.Label(info, textvariable=self.iface_var, bg=self.COL_BG, fg=self.COL_TEXT, font=self.FONT).grid(
-            row=0, column=1, sticky="w", padx=(6, 16)
-        )
-        tk.Label(info, text="filter:", bg=self.COL_BG, fg=self.COL_MUTED, font=self.FONT).grid(
-            row=0, column=2, sticky="w"
-        )
-        tk.Label(info, textvariable=self.filter_var, bg=self.COL_BG, fg=self.COL_TEXT, font=self.FONT).grid(
-            row=0, column=3, sticky="w", padx=(6, 16)
-        )
-        tk.Label(info, text="pkts:", bg=self.COL_BG, fg=self.COL_MUTED, font=self.FONT).grid(
-            row=0, column=4, sticky="w"
-        )
-        tk.Label(info, textvariable=self.pktrate_var, bg=self.COL_BG, fg=self.COL_CYAN, font=self.FONT).grid(
-            row=0, column=5, sticky="w", padx=(6, 0)
-        )
+        tk.Label(
+            info, text="iface:", bg=self.COL_BG, fg=self.COL_MUTED, font=self.FONT
+        ).grid(row=0, column=0, sticky="w")
+        tk.Label(
+            info,
+            textvariable=self.iface_var,
+            bg=self.COL_BG,
+            fg=self.COL_TEXT,
+            font=self.FONT,
+        ).grid(row=0, column=1, sticky="w", padx=(6, 16))
+        tk.Label(
+            info, text="filter:", bg=self.COL_BG, fg=self.COL_MUTED, font=self.FONT
+        ).grid(row=0, column=2, sticky="w")
+        tk.Label(
+            info,
+            textvariable=self.filter_var,
+            bg=self.COL_BG,
+            fg=self.COL_TEXT,
+            font=self.FONT,
+        ).grid(row=0, column=3, sticky="w", padx=(6, 16))
+        tk.Label(
+            info, text="pkts:", bg=self.COL_BG, fg=self.COL_MUTED, font=self.FONT
+        ).grid(row=0, column=4, sticky="w")
+        tk.Label(
+            info,
+            textvariable=self.pktrate_var,
+            bg=self.COL_BG,
+            fg=self.COL_CYAN,
+            font=self.FONT,
+        ).grid(row=0, column=5, sticky="w", padx=(6, 0))
 
-        # Filters: severity + search
         filters = tk.Frame(controls, bg=self.COL_BG)
         filters.pack(side=tk.RIGHT)
 
-        tk.Label(filters, text="Show:", bg=self.COL_BG, fg=self.COL_MUTED, font=self.FONT).pack(
-            side=tk.LEFT, padx=(0, 6)
-        )
+        tk.Label(
+            filters, text="Show:", bg=self.COL_BG, fg=self.COL_MUTED, font=self.FONT
+        ).pack(side=tk.LEFT, padx=(0, 6))
         self.sev_combo = ttk.Combobox(
             filters,
             values=["ALL", "HIGH", "MEDIUM", "LOW", "INFO"],
             textvariable=self.sev_filter_var,
             width=8,
             state="readonly",
+            font=("Segoe UI", 11, "bold"),
         )
         self.sev_combo.pack(side=tk.LEFT, padx=(0, 10))
 
-        tk.Label(filters, text="Search IP:", bg=self.COL_BG, fg=self.COL_MUTED, font=self.FONT).pack(
-            side=tk.LEFT, padx=(0, 6)
-        )
+        tk.Label(
+            filters,
+            text="Search IP:",
+            bg=self.COL_BG,
+            fg=self.COL_MUTED,
+            font=self.FONT,
+        ).pack(side=tk.LEFT, padx=(0, 6))
         self.search_entry = tk.Entry(
             filters,
             textvariable=self.search_var,
@@ -267,7 +294,6 @@ class IDSUI:
         right.pack(side=tk.RIGHT, fill=tk.Y)
         right.pack_propagate(False)
 
-        # KPI row
         kpi_row = tk.Frame(left, bg=self.COL_BG)
         kpi_row.pack(fill=tk.X, pady=(0, 10))
 
@@ -278,10 +304,13 @@ class IDSUI:
         self._kpi_card(kpi_row, "ATTACKERS", self.attackers_var, self.COL_BLUE)
         self._kpi_card(kpi_row, "PACKETS", self.packets_var, self.COL_TEXT)
 
-        # Live events panel
         log_panel = self._panel(left, pad=(0, 0), expand=True)
         tk.Label(
-            log_panel, text="LIVE EVENTS", bg=self.COL_PANEL, fg=self.COL_TEXT, font=self.FONT_H2
+            log_panel,
+            text="LIVE EVENTS",
+            bg=self.COL_PANEL,
+            fg=self.COL_TEXT,
+            font=self.FONT_H2,
         ).pack(anchor="w", padx=10, pady=(10, 6))
 
         self.log_box = ScrolledText(
@@ -295,18 +324,19 @@ class IDSUI:
         )
         self.log_box.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
 
-        # Severity tags
         self.log_box.tag_config("HIGH", foreground=self.COL_RED)
         self.log_box.tag_config("MEDIUM", foreground=self.COL_YELLOW)
         self.log_box.tag_config("LOW", foreground=self.COL_GREEN)
         self.log_box.tag_config("INFO", foreground=self.COL_MUTED)
         self.log_box.tag_config("DEBUG", foreground=self.COL_BLUE)
 
-        # ---------- Right column ----------
-        # Last alert card
         last_panel = self._panel(right, pad=(0, (0, 10)), fill=tk.X, expand=False)
         tk.Label(
-            last_panel, text="LAST ALERT", bg=self.COL_PANEL, fg=self.COL_TEXT, font=self.FONT_H2
+            last_panel,
+            text="LAST ALERT",
+            bg=self.COL_PANEL,
+            fg=self.COL_TEXT,
+            font=self.FONT_H2,
         ).pack(anchor="w", padx=10, pady=(10, 6))
 
         self.last_alert_lbl = tk.Label(
@@ -322,10 +352,13 @@ class IDSUI:
         )
         self.last_alert_lbl.pack(fill=tk.X, padx=10, pady=(0, 10))
 
-        # Top attackers panel
         atk_panel = self._panel(right, pad=(0, (0, 10)), fill=tk.BOTH, expand=True)
         tk.Label(
-            atk_panel, text="TOP ATTACKERS", bg=self.COL_PANEL, fg=self.COL_TEXT, font=self.FONT_H2
+            atk_panel,
+            text="TOP ATTACKERS",
+            bg=self.COL_PANEL,
+            fg=self.COL_TEXT,
+            font=self.FONT_H2,
         ).pack(anchor="w", padx=10, pady=(10, 6))
 
         self.atk_list = ScrolledText(
@@ -335,15 +368,18 @@ class IDSUI:
             insertbackground=self.COL_TEXT,
             relief=tk.FLAT,
             font=self.FONT,
-            height=14,
+            height=12,
         )
         self.atk_list.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
         self.atk_list.config(state=tk.DISABLED)
 
-        # Tips panel
         tips_panel = self._panel(right, pad=(0, 0), fill=tk.X, expand=False)
         tk.Label(
-            tips_panel, text="QUICK TESTS", bg=self.COL_PANEL, fg=self.COL_TEXT, font=self.FONT_H2
+            tips_panel,
+            text="QUICK TESTS",
+            bg=self.COL_PANEL,
+            fg=self.COL_TEXT,
+            font=self.FONT_H2,
         ).pack(anchor="w", padx=10, pady=(10, 6))
 
         tips = (
@@ -376,14 +412,12 @@ class IDSUI:
             self.status_pill.configure(bg=self.COL_BORDER, fg=self.COL_MUTED)
 
     def log_line(self, msg: str, tag: str = "INFO"):
+        self.log_box.configure(state="normal")
         self.log_box.insert(tk.END, msg + "\n", tag)
         self.log_box.see(tk.END)
+        self.log_box.configure(state="disabled")
 
     def ui_event_callback(self, event: dict):
-        """
-        Called from IDS thread via logger.
-        Do NOT touch Tk here -> put event into queue.
-        """
         self.ui_queue.put(event)
 
     def refresh_attackers(self):
@@ -404,13 +438,7 @@ class IDSUI:
                 last = st.get("last", "")
                 last_type = st.get("last_type", "")
                 last_sev = st.get("last_sev", "")
-                sev_color = {
-                    "HIGH": self.COL_RED,
-                    "MEDIUM": self.COL_YELLOW,
-                    "LOW": self.COL_GREEN,
-                }.get(last_sev, self.COL_MUTED)
 
-                # Draw in plain text (simple + clean)
                 self.atk_list.insert(tk.END, f"{ip}\n")
                 self.atk_list.insert(
                     tk.END,
@@ -430,15 +458,12 @@ class IDSUI:
                 msg = str(event.get("message", ""))
                 ts = str(event.get("time", ""))
 
-                # Packet count events (optional): if your logger/sniffer sends type=PACKET
-                # Not required; we also count packets from DEBUG events if you add them.
                 if typ == "PACKET":
                     self.pkt_count += 1
                     self._pkt_window_count += 1
                     self.packets_var.set(str(self.pkt_count))
                     continue
 
-                # UI internal control message
                 if typ == "UI" and msg == "__RESET_BUTTONS__":
                     self.running = False
                     self.start_btn.config(state=tk.NORMAL)
@@ -446,7 +471,11 @@ class IDSUI:
                     self._set_status_running(False)
                     continue
 
-                # Update counters if this is an alert
+                if typ == "UIINFO":
+                    self.iface_var.set(str(event.get("message", "-")))
+                    self.filter_var.set(str(event.get("extra", {}).get("filter", "-")))
+                    continue
+
                 if sev in ("LOW", "MEDIUM", "HIGH"):
                     self.total_alerts += 1
                     self.total_var.set(str(self.total_alerts))
@@ -461,7 +490,6 @@ class IDSUI:
                         self.high_count += 1
                         self.high_var.set(str(self.high_count))
 
-                    # Update last alert card
                     src_ip = event.get("src_ip", "?")
                     self.last_alert_var.set(f"{sev} — {typ}\nfrom {src_ip}\n{msg}")
                     if sev == "HIGH":
@@ -471,9 +499,11 @@ class IDSUI:
                     else:
                         self.last_alert_lbl.configure(fg=self.COL_GREEN)
 
-                    # Track attacker stats if src_ip exists
                     if src_ip and src_ip != "?":
-                        st = self.attacker_stats.get(src_ip, {"alerts": 0, "last": "", "last_type": "", "last_sev": ""})
+                        st = self.attacker_stats.get(
+                            src_ip,
+                            {"alerts": 0, "last": "", "last_type": "", "last_sev": ""},
+                        )
                         st["alerts"] += 1
                         st["last"] = ts
                         st["last_type"] = typ
@@ -482,7 +512,6 @@ class IDSUI:
                         self.attackers_var.set(str(len(self.attacker_stats)))
                         self.refresh_attackers()
 
-                # Filtering logic for event log display
                 if not self._passes_filters(event):
                     continue
 
@@ -490,7 +519,9 @@ class IDSUI:
                 if typ == "DEBUG":
                     tag = "DEBUG"
 
-                icon = {"HIGH": "🚨", "MEDIUM": "🟠", "LOW": "🟢", "INFO": "•"}.get(sev, "•")
+                icon = {"HIGH": "🚨", "MEDIUM": "🟠", "LOW": "🟢", "INFO": "•"}.get(
+                    sev, "•"
+                )
                 line = f"[{ts}] {icon} {sev}: {typ} - {msg}"
                 self.log_line(line, tag=tag)
 
@@ -511,7 +542,6 @@ class IDSUI:
             src_ip = str(event.get("src_ip", ""))
             dst_ip = str(event.get("dst_ip", ""))
             msg = str(event.get("message", ""))
-            # simple contains match
             if search not in src_ip and search not in dst_ip and search not in msg:
                 return False
 
@@ -525,7 +555,6 @@ class IDSUI:
         rate = self._pkt_window_count / elapsed
         self.pktrate_var.set(f"{rate:.1f}/s")
 
-        # reset window
         self._pkt_window_start = now
         self._pkt_window_count = 0
 
@@ -541,10 +570,6 @@ class IDSUI:
         self.stop_btn.config(state=tk.NORMAL)
         self._set_status_running(True)
 
-        # Clear last alert if desired
-        # self.last_alert_var.set("No alerts yet.")
-
-        # Start worker thread
         t = threading.Thread(target=self.run_ids, daemon=True)
         t.start()
 
@@ -561,11 +586,21 @@ class IDSUI:
             try:
                 self.sniffer.stop()
                 self.ui_queue.put(
-                    {"time": self._now_str(), "severity": "INFO", "type": "STATUS", "message": "IDS stopped."}
+                    {
+                        "time": self._now_str(),
+                        "severity": "INFO",
+                        "type": "STATUS",
+                        "message": "IDS stopped.",
+                    }
                 )
             except Exception as e:
                 self.ui_queue.put(
-                    {"time": self._now_str(), "severity": "HIGH", "type": "ERROR", "message": f"Stop error: {e}"}
+                    {
+                        "time": self._now_str(),
+                        "severity": "HIGH",
+                        "type": "ERROR",
+                        "message": f"Stop error: {e}",
+                    }
                 )
             finally:
                 self.sniffer = None
@@ -575,17 +610,13 @@ class IDSUI:
 
     # ---------------- Background IDS thread ----------------
     def run_ids(self):
-        """
-        Runs in background thread. NEVER touch Tk widgets directly here.
-        Send all messages via ui_queue.
-        """
         try:
             cfg = load_config("configs/default.json")
 
-            # Pick interface
-            iface = pick_interface_cross_platform(mode=cfg.interface_mode, index=cfg.interface_index)
+            iface = pick_interface_cross_platform(
+                mode=cfg.interface_mode, index=cfg.interface_index
+            )
 
-            # Update UI info
             self.ui_queue.put(
                 {
                     "time": "",
@@ -595,12 +626,12 @@ class IDSUI:
                 }
             )
 
-            # Create IDS components
-            logger = EventLogger(cfg.log_file_txt, cfg.log_file_jsonl, ui_callback=self.ui_event_callback)
+            logger = EventLogger(
+                cfg.log_file_txt, cfg.log_file_jsonl, ui_callback=self.ui_event_callback
+            )
             detectors = IDSDetectors(cfg, logger)
             self.sniffer = IDSSniffer(iface, cfg.bpf_filter, detectors)
 
-            # STATUS
             self.ui_queue.put(
                 {
                     "time": "",
@@ -610,23 +641,30 @@ class IDSUI:
                 }
             )
 
-            # Also update header vars (safe: via queue -> handled by log only)
-            # We'll update the vars here by sending a UI event handled in main thread:
             self.ui_queue.put(
-                {"time": "", "severity": "INFO", "type": "UIINFO", "message": iface, "extra": {"filter": cfg.bpf_filter}}
+                {
+                    "time": "",
+                    "severity": "INFO",
+                    "type": "UIINFO",
+                    "message": iface,
+                    "extra": {"filter": cfg.bpf_filter},
+                }
             )
 
-            # Start sniffing
             self.sniffer.start()
 
-            # Update visible vars (do it by pushing a UI event that we handle in main thread)
-            # We'll rely on status log + the iface/filter vars set below:
-            # Since process_ui_queue does not handle UIINFO by default, we can set vars here safely? NO (thread).
-            # So we add a small trick: push a special UI message and handle it in main thread.
-
         except Exception as e:
-            self.ui_queue.put({"time": "", "severity": "HIGH", "type": "ERROR", "message": str(e)})
-            self.ui_queue.put({"time": "", "severity": "INFO", "type": "UI", "message": "__RESET_BUTTONS__"})
+            self.ui_queue.put(
+                {"time": "", "severity": "HIGH", "type": "ERROR", "message": str(e)}
+            )
+            self.ui_queue.put(
+                {
+                    "time": "",
+                    "severity": "INFO",
+                    "type": "UI",
+                    "message": "__RESET_BUTTONS__",
+                }
+            )
 
     # ---------------- Close ----------------
     def on_close(self):
@@ -638,51 +676,7 @@ class IDSUI:
 
     # ---------------- Run ----------------
     def run(self):
-        # Hook to update iface/filter vars via queue special messages
-        # We'll do it by intercepting UIINFO events in the queue processor.
-        # (Implemented by lightly patching process_ui_queue behavior using a wrapper.)
-        # Easiest: override process_ui_queue to handle UIINFO by checking inside loop (already there).
-        # We'll just add the UIINFO handler here by monkey patching a method attribute.
-        self._install_uiinfo_handler()
         self.root.mainloop()
-
-    def _install_uiinfo_handler(self):
-        # Patch: Add UIINFO handling inside process_ui_queue without rewriting everything.
-        # We'll do it by wrapping the existing queue items handling using a flag.
-        # Simpler: store a reference and replace with a new function that handles UIINFO,
-        # but we already have process_ui_queue defined. We'll just update it with a small state
-        # by adding a method attribute used in _passes_filters. No extra needed.
-        # Instead: handle UIINFO in process_ui_queue by recognizing typ == "UIINFO".
-        # Since code is already defined, we’ll add that handling by setting a marker the method checks.
-        # We'll do it by setting an attribute and checking it inside _passes_filters is not enough.
-        # So we implement UIINFO support by using a small "hook" event type: pack it into INFO log,
-        # and also set vars from the main thread by scheduling `after(0, ...)`.
-        def _apply_uiinfo(iface, bpf):
-            self.iface_var.set(iface)
-            self.filter_var.set(bpf)
-
-        # Schedule periodic check for UIINFO by intercepting queue at UI thread:
-        # Easiest: add a dedicated after that drains UIINFO-only messages.
-        def drain_uiinfo():
-            drained = False
-            try:
-                while True:
-                    ev = self.ui_queue.get_nowait()
-                    if str(ev.get("type")) == "UIINFO":
-                        iface = str(ev.get("message", "-"))
-                        bpf = str(ev.get("extra", {}).get("filter", "-"))
-                        _apply_uiinfo(iface, bpf)
-                        drained = True
-                        continue
-                    # put back other events for normal processor
-                    self.ui_queue.put(ev)
-                    break
-            except queue.Empty:
-                pass
-
-            self.root.after(100, drain_uiinfo)
-
-        drain_uiinfo()
 
 
 if __name__ == "__main__":

@@ -13,24 +13,69 @@ class IDSDetectors:
     def __init__(self, cfg: IDSConfig, logger: EventLogger):
         self.cfg = cfg
         self.log = logger
-
-        # Anti-spam
         self._last_icmp: Dict[Tuple[str, str], float] = {}
-
-        # Recent activity
         self._recent_ports_by_src = defaultdict(lambda: deque(maxlen=cfg.deque_maxlen))
         self._recent_syn_by_src = defaultdict(lambda: deque(maxlen=cfg.deque_maxlen))
-
-        # Optional: scan alert cooldown to reduce repeated HIGH spam
         self._last_scan_alert: Dict[str, float] = {}
         self._scan_alert_cooldown_sec = 5
+
+        # ADD THIS: Throttle for the cleanup loop
+        self._last_cleanup: Dict[str, float] = {}
+
+    # ... [Keep handle_icmp exactly the same, just delete the DBG print] ...
+
+    def detect_portscan(self, src_ip: str) -> None:
+        dq = self._recent_ports_by_src[src_ip]
+        t = time.time()
+
+        # Optimization: Only clean the deque once per second
+        if t - self._last_cleanup.get(src_ip, 0) > 1.0:
+            cleanup_old_entries(dq, self.cfg.scan_window_sec)
+            self._last_cleanup[src_ip] = t
+
+        unique_ports = {dport for (ts, dport) in dq}
+        if len(unique_ports) >= self.cfg.portscan_unique_ports and self._can_scan_alert(
+            src_ip
+        ):
+            self.log.log(
+                severity="HIGH",
+                event_type="PORT_SCAN",
+                message=f"{src_ip} touched {len(unique_ports)} unique ports in {self.cfg.scan_window_sec}s",
+                src_ip=src_ip,
+                extra={
+                    "unique_ports_count": len(unique_ports),
+                    "window_sec": self.cfg.scan_window_sec,
+                },
+            )
+            dq.clear()
+
+    def detect_syn_scan(self, src_ip: str) -> None:
+        dq = self._recent_syn_by_src[src_ip]
+        t = time.time()
+
+        # Optimization: Only clean the deque once per second
+        if t - self._last_cleanup.get(src_ip, 0) > 1.0:
+            cleanup_old_entries(dq, self.cfg.scan_window_sec)
+            self._last_cleanup[src_ip] = t
+
+        if len(dq) >= self.cfg.synscan_syn_count and self._can_scan_alert(src_ip):
+            self.log.log(
+                severity="HIGH",
+                event_type="SYN_SCAN",
+                message=f"{src_ip} sent {len(dq)} SYN packets in {self.cfg.scan_window_sec}s",
+                src_ip=src_ip,
+                extra={"syn_count": len(dq), "window_sec": self.cfg.scan_window_sec},
+            )
+            dq.clear()
 
     # ---------- ICMP ----------
     def handle_icmp(self, packet, src_ip: str, dst_ip: str) -> None:
         # ---- DEBUG (TEMP) ----
         try:
             icmp_layer = packet[ICMP]
-            print(f"[DBG ICMP] {src_ip} -> {dst_ip} type={int(icmp_layer.type)} code={int(icmp_layer.code)}")
+            print(
+                f"[DBG ICMP] {src_ip} -> {dst_ip} type={int(icmp_layer.type)} code={int(icmp_layer.code)}"
+            )
         except Exception:
             pass
         # ----------------------
@@ -70,7 +115,9 @@ class IDSDetectors:
         cleanup_old_entries(dq, self.cfg.scan_window_sec)
 
         unique_ports = {dport for (ts, dport) in dq}
-        if len(unique_ports) >= self.cfg.portscan_unique_ports and self._can_scan_alert(src_ip):
+        if len(unique_ports) >= self.cfg.portscan_unique_ports and self._can_scan_alert(
+            src_ip
+        ):
             self.log.log(
                 severity="HIGH",
                 event_type="PORT_SCAN",

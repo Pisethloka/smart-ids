@@ -1,5 +1,5 @@
 # For linux users
-    
+
     -> Open your terminal amd write this: <-
     =====================================
         cd ~/smart-ids
@@ -43,6 +43,31 @@
     =======================================
     curl https://google.com or any other sites
     ==========================================
-    
 
+# For window users
 
+    -> 1. ICMP Detection (LOW severity) <-
+    ======================================
+    ping -n 5 8.8.8.8
+    ======================================
+
+    -> 2. Suspicious Port Test <-
+    ======================================
+    Test-NetConnection -ComputerName 192.168.10.9 -Port 23
+    ======================================
+    ->/ Triggers MEDIUM severity alert
+    ->/ Logs specific suspicious port access
+
+    -> 3. Port Scan Test (Realistic Attack Simulation) <-
+    ======================================
+    nmap -Pn -p 1-100 192.168.10.9
+    ======================================
+    ->/ Note: You must have Nmap installed on Windows for this to work.
+    ->/ Multiple ports accessed could trigger MEDIUM or HIGH
+
+    -> 4. SYN Scan (Advanced) <-
+    ======================================
+    nmap -sS 192.168.10.9
+    ======================================
+    ->/ Note: Removed 'sudo'. PowerShell must be running as Administrator.
+    ->/ This is a half-open scan. It should trigger HIGH severity.

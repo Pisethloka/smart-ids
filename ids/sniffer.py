@@ -11,8 +11,7 @@ class IDSSniffer:
         self._sniffer = None
 
     def packet_callback(self, packet) -> None:
-        print("[DBG] got packet:", packet.summary())
-
+        # DBG print removed to prevent I/O bottleneck during high-speed scans
         if not packet.haslayer(IP):
             return
 
