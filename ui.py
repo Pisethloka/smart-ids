@@ -35,7 +35,7 @@ class IDSUI:
     COL_CYAN = "#22d3ee"
     COL_BLUE = "#60a5fa"
 
-    FONT = ("Consolas", 10)
+    FONT = ("Consolas", 12)
     FONT_TITLE = ("Consolas", 13, "bold")
     FONT_H2 = ("Consolas", 11, "bold")
     FONT_KPI = ("Consolas", 20, "bold")
@@ -79,7 +79,7 @@ class IDSUI:
         self.attackers_var = tk.StringVar(value="0")
         self.packets_var = tk.StringVar(value="0")
 
-        self.last_alert_var = tk.StringVar(value="No alerts yet.")
+        self.last_alert_var = tk.StringVar(value="NO ALERTS YET!")
 
         # Filters
         self.sev_filter_var = tk.StringVar(value="ALL")
@@ -115,7 +115,7 @@ class IDSUI:
             arrowcolor=self.COL_RED,
         )
 
-        # --- FIX THE READONLY COLOR ---
+        # --- THE READONLY COLOR ---
         style.map(
             "TCombobox",
             fieldbackground=[("readonly", self.COL_PANEL_2)],
@@ -380,12 +380,12 @@ class IDSUI:
             bg=self.COL_PANEL,
             fg=self.COL_TEXT,
             font=self.FONT_H2,
-        ).pack(anchor="w", padx=10, pady=(10, 6))
+        ).pack(anchor="w", padx=100, pady=(2, 2))
 
         tips = (
-            "• ICMP:  ping -c 3 8.8.8.8\n"
-            "• Port scan:  nmap -Pn -T4 -p 1-200 <target>\n"
-            "• SYN scan:   sudo nmap -sS -Pn -T4 -p 1-200 <target>\n"
+            "• ICMP: ping -c 3 8.8.8.8\n"
+            "• Port scan: nmap -Pn -T4 -p 1-200 <target>\n"
+            "• SYN scan: sudo nmap -sS -Pn -T4 -p 1-200 <target>\n"
             "• Suspicious: scan/try port 23 or 4444\n"
         )
         tk.Label(
@@ -397,7 +397,7 @@ class IDSUI:
             justify="left",
             padx=10,
             pady=10,
-        ).pack(fill=tk.X, padx=10, pady=(0, 10))
+        ).pack(fill=tk.X, padx=2, pady=(0, 10))
 
     # ---------------- UI helpers ----------------
     def clear_search(self):
