@@ -1,5 +1,5 @@
 # For linux users
-
+    
     -> Open your terminal amd write this: <-
     =====================================
         cd ~/smart-ids
@@ -22,7 +22,8 @@
 
     -> Port Scan Test (Realisitic Attack Simulation) <-
     ======================================
-    nmap -Pn -p 1-100 192.168.10.9
+    Normal Speed: nmap -Pn -p 1-100 192.168.10.9
+    Faster Speed: nmap -Pn -T4 -p 1-200 192.168.10.1
     ======================================
     ->/ Mutilple ports accessed
     ->/ could trigger MEDIUM or HIGH
@@ -33,7 +34,8 @@
 
     -> SYN Scan (Advanced) <-
     ======================================
-    sudo nmap -sS 192.168.10.9
+    Normal Speed: sudo nmap -sS -Pn 192.168.10.9
+    Even better: sudo nmap -sS -Pn -T4 -p 1-200 192.168.10.9
     ======================================
     ->/ This is a half open scan. It should trigger after threshold reached
     =======================================================================
@@ -41,33 +43,10 @@
 
     -> Normal Traffic (False Positive Test)
     =======================================
-    curl https://google.com or any other sites
+    ping -c 3 8.8.8.8
+    curl -I http://example.com
     ==========================================
+    curl https://google.com or any other sites
+    
 
-# For window users
 
-    -> 1. ICMP Detection (LOW severity) <-
-    ======================================
-    ping -n 5 8.8.8.8
-    ======================================
-
-    -> 2. Suspicious Port Test <-
-    ======================================
-    Test-NetConnection -ComputerName 192.168.10.9 -Port 23
-    ======================================
-    ->/ Triggers MEDIUM severity alert
-    ->/ Logs specific suspicious port access
-
-    -> 3. Port Scan Test (Realistic Attack Simulation) <-
-    ======================================
-    nmap -Pn -p 1-100 192.168.10.9
-    ======================================
-    ->/ Note: You must have Nmap installed on Windows for this to work.
-    ->/ Multiple ports accessed could trigger MEDIUM or HIGH
-
-    -> 4. SYN Scan (Advanced) <-
-    ======================================
-    nmap -sS 192.168.10.9
-    ======================================
-    ->/ Note: Removed 'sudo'. PowerShell must be running as Administrator.
-    ->/ This is a half-open scan. It should trigger HIGH severity.
