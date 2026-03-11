@@ -1,18 +1,26 @@
 {
-  "suspicious_ports": [23, 4444],
-  "icmp_cooldown_sec": 3,
+    "app_name": "SMART-IDS",
+    "log_text_file": "ids_log.txt",
+    "log_json_file": "ids_log.jsonl",
+    "ui_refresh_ms": 250,
 
-  "scan_window_sec": 10,
-  "portscan_unique_ports": 12,
-  "synscan_syn_count": 20,
+    "detection": {
+        "port_scan_unique_ports": 8,
+        "port_scan_window_sec": 8,
+        "icmp_burst_threshold": 10,
+        "icmp_burst_window_sec": 5,
+        "tcp_burst_threshold": 20,
+        "tcp_burst_window_sec": 5,
+        "alert_cooldown_sec": 5
+    },
 
-  "bpf_filter": "icmp or tcp",
-
-  "log_file_txt": "ids_log.txt",
-  "log_file_jsonl": "ids_log.jsonl",
-
-  "interface_mode": "auto",
-  "interface_index": 0,
-
-  "deque_maxlen": 2000
+    "defaults": {
+        "defender_interface": "lo",
+        "attacker_target": "127.0.0.1",
+        "port_scan_start": 20,
+        "port_scan_end": 60,
+        "tcp_port": 8000,
+        "tcp_connections": 50,
+        "ping_count": 25
+    }
 }
